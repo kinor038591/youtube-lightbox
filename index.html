@@ -12,11 +12,13 @@
         
         .video-container {
             width: 100%;
-            max-width: 1280px;
+            /* 預設最大寬度 1280px，搭配 16:9 比例，高度最大即為 720px */
+            max-width: 1280px; 
             aspect-ratio: 16 / 9;
-            /* 確保在較矮的螢幕上不會超出畫面，並自動縮小寬度以維持 16:9 */
-            max-height: calc(100vh - 4rem);
-            width: min(100%, calc((100vh - 4rem) * 16 / 9));
+            /* 確保在較矮的螢幕上不會超出畫面 (最大 720px 或 視窗高度扣除邊距) */
+            max-height: min(720px, calc(100vh - 4rem));
+            /* 自動縮小寬度以維持 16:9，確保完整呈現影片不被裁切 */
+            width: min(100%, calc(min(720px, calc(100vh - 4rem)) * 16 / 9));
             margin: 0 auto;
         }
     </style>
@@ -40,7 +42,7 @@
                 <div>
                     <input type="text" id="yt-input" 
                         class="w-full px-4 py-3 border border-[#D8C7B2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C8915C] focus:border-[#C8915C] transition-shadow text-[#4A3B32] placeholder-[#A89885]" 
-                        placeholder="請輸入 YouTube 網址... ">
+                        placeholder="請輸入 YouTube 網址...">
                 </div>
                 <button id="generate-btn" 
                     class="w-full bg-[#C8915C] hover:bg-[#B37D4A] text-white font-semibold py-3 px-4 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
@@ -110,8 +112,8 @@
 
             // --- 需求 4: 解析 YouTube 網址擷取 11 碼影片 ID ---
             const extractYouTubeID = (url) => {
-                // 這個正則表達式涵蓋了：標準 watch?v=、youtu.be/ 短網址、embed/、shorts/ 等多種格式
-                const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/\s]{11})/i;
+                // 這個正則表達式新增了 (?:shorts|live) 涵蓋：標準 watch?v=、youtu.be/ 短網址、embed/、shorts/ 以及 live/ 直播格式
+                const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/(?:shorts|live)\/)([^"&?\/\s]{11})/i;
                 const match = url.match(regExp);
                 return (match && match[1].length === 11) ? match[1] : null;
             };
